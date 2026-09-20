@@ -8,11 +8,18 @@ The original run used an **Apple M4 Max MacBook Pro with 48 GB unified memory**,
 
 ## Quick start
 
-Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then:
+On an Apple Silicon Mac, install [uv](https://docs.astral.sh/uv/getting-started/installation/):
+
+```sh
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Open a new terminal after installation so `uv` is on your PATH. If you already use Homebrew, `brew install uv` is an alternative. Then:
 
 ```sh
 git clone https://github.com/expectedparrot/edsl-bonsai-behavioral-tests.git
 cd edsl-bonsai-behavioral-tests
+uv python install 3.12
 uv sync --locked
 uv run python download_model.py
 uv run python ask_linda.py
@@ -23,6 +30,167 @@ The downloader fetches the pinned runtime and approximately 7.21 GB of weights, 
 `ask_linda.py` starts the server as a subprocess, waits for model readiness, asks the question, saves `runs/linda.results.ep`, and shuts down its server even if inference fails. If a healthy server already runs on port 8087, the script reuses it and leaves it running. A reused server must use the same model alias and intended settings. Startup messages are in `managed-server.log`.
 
 The correct Linda answer is “Linda is a bank teller.” Generated answers can vary.
+
+## Install EDSL at the tested commit
+
+The standalone example was tested with EDSL commit
+[`852a050d0b4e84facdaea0628e7c1e062daa4a46`](https://github.com/expectedparrot/edsl/commit/852a050d0b4e84facdaea0628e7c1e062daa4a46),
+which reports version `1.0.8.dev1`. This is the revision verified during packaging and the subsequent live Linda smoke test. The original 84-response run recorded the version but not its Git revision, so we cannot establish that its checkout was this exact commit.
+
+**For this repository**, `uv sync --locked` creates `.venv/` and installs that Git revision plus the dependencies pinned in [`uv.lock`](uv.lock). You do not need to install EDSL separately. Python 3.12 and uv 0.11.13 were used for the packaging checks; GitHub's offline checks also use uv 0.11.13.
+
+**To install the same EDSL revision directly in your own environment**, use uv's [package installation interface](https://docs.astral.sh/uv/pip/packages/):
+
+```sh
+uv venv --python 3.12
+source .venv/bin/activate
+uv pip install \
+  'edsl @ git+https://github.com/expectedparrot/edsl.git@852a050d0b4e84facdaea0628e7c1e062daa4a46' \
+  'openai[aiohttp]==2.54.0'
+ep info
+```
+
+Run this alternative in the directory where you want your environment. It pins EDSL and the OpenAI SDK; use the repository's lockfile for the full tested dependency set. Installing from Git requires `git` on your PATH. On macOS, `xcode-select --install` installs Apple's command-line developer tools if Git is missing.
+
+The `aiohttp` extra is required by EDSL's asynchronous OpenAI-compatible transport. Our clean-install smoke test failed without it. EDSL uses the SDK to call the local Bonsai endpoint; it does not require an OpenAI account or API key for this example.
+
+To verify the EDSL source revision installed by the quick start:
+
+```sh
+uv run python - <<'PY'
+import json
+from importlib.metadata import distribution
+
+package = distribution("edsl")
+source = json.loads(package.read_text("direct_url.json"))
+print("EDSL version:", package.version)
+print("Git commit:", source["vcs_info"]["commit_id"])
+PY
+```
+
+The commit printed should be `852a050d0b4e84facdaea0628e7c1e062daa4a46`.
+
+## Install the Bonsai server and model
+
+There are three pieces:
+
+| Piece | Where it comes from | What it does |
+| --- | --- | --- |
+| [`bonsai_server.py`](bonsai_server.py) | Included when you clone this repository | Python context manager that starts, checks, and stops the server subprocess |
+| `llama-server` | PrismML's prebuilt macOS arm64 runtime archive | Loads Bonsai and serves an OpenAI-compatible HTTP API using Metal |
+| `Ternary-Bonsai-2-27B-PQ2_0.gguf` | Pinned PrismML model repository on Hugging Face | The model weights loaded by the server |
+
+**`bonsai_server` is a local Python module, not a separate package to install with pip.** Run the examples from this cloned repository so `from bonsai_server import bonsai_server` finds the included file. Installing EDSL alone does not install the Bonsai runtime or model. PrismML's fork is required for the tested weight format; the setup uses its prebuilt executable rather than compiling it.
+
+### Automatic download and installation
+
+From the repository root:
+
+```sh
+uv run python download_model.py
+uv run python download_model.py --check-only
+```
+
+The first command downloads the archive and weights, verifies both against [`downloads.json`](downloads.json), and extracts the runtime into `runtime/`. It reuses already downloaded files when their checksums match. If a transfer is interrupted, run it again; incomplete `.part` files are downloaded afresh rather than resumed. The second command checks the downloaded archive and weights without network access; it does not validate the extracted runtime files individually.
+
+The model file is **7,206,168,928 bytes** (7.21 GB decimal); the runtime archive is approximately 11 MB. Total memory use also includes the model's runtime buffers and context cache. We tested on 48 GB unified memory and did not establish a minimum RAM requirement.
+
+After installation, these paths should exist:
+
+```text
+edsl-bonsai-behavioral-tests/
+├── bonsai_server.py
+├── start-server.sh
+├── runtime/
+│   ├── llama-macos-arm64.tar.gz
+│   └── llama-prism-b10683-d8f26ee/
+│       ├── llama-server
+│       └── ... runtime libraries and other executables
+└── models/
+    └── Ternary-Bonsai-2-27B-PQ2_0.gguf
+```
+
+The runtime and weights are ignored by Git. The downloader's `--asset-dir PATH` option can verify or download to another location, but `start-server.sh` expects the paths above; changing the download destination alone does not reconfigure the launcher.
+
+### Exact versions and download links
+
+| Asset | Pin |
+| --- | --- |
+| EDSL | `852a050d0b4e84facdaea0628e7c1e062daa4a46` |
+| PrismML runtime release | [`prism-b10683-d8f26ee`](https://github.com/PrismML-Eng/llama.cpp/releases/tag/prism-b10683-d8f26ee) |
+| Runtime archive | [llama-prism-b10683-d8f26ee-bin-macos-arm64.tar.gz](https://github.com/PrismML-Eng/llama.cpp/releases/download/prism-b10683-d8f26ee/llama-prism-b10683-d8f26ee-bin-macos-arm64.tar.gz) |
+| Hugging Face model repository | [`prism-ml/Ternary-Bonsai-2-27B-gguf`](https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf) |
+| Model revision | `6ed5e12bf84b7a63069882c91dd9e9218647d17b` |
+| Weight file | [Ternary-Bonsai-2-27B-PQ2_0.gguf](https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf/resolve/6ed5e12bf84b7a63069882c91dd9e9218647d17b/Ternary-Bonsai-2-27B-PQ2_0.gguf) |
+
+Expected SHA-256 digests:
+
+```text
+Runtime archive:
+0ae163ca2c9cce92470316ed743f76985beea4d5cf31b8dc546711cf6fc8dd35
+
+Model weights:
+3907dc1658db1f78a9826bf8d5bcb8dc65db0d466388937af57f2294fae62ec1
+```
+
+### Manual download alternative
+
+The automatic downloader handles this for you. If you prefer to download explicitly, run the following from the repository root. The checksum must pass before extracting the runtime:
+
+```sh
+mkdir -p runtime models
+
+curl -fL --retry 3 \
+  https://github.com/PrismML-Eng/llama.cpp/releases/download/prism-b10683-d8f26ee/llama-prism-b10683-d8f26ee-bin-macos-arm64.tar.gz \
+  -o runtime/llama-macos-arm64.tar.gz
+
+printf '%s  %s\n' \
+  0ae163ca2c9cce92470316ed743f76985beea4d5cf31b8dc546711cf6fc8dd35 \
+  runtime/llama-macos-arm64.tar.gz | shasum -a 256 -c - && \
+  tar -xzf runtime/llama-macos-arm64.tar.gz -C runtime
+
+curl -fL --retry 3 \
+  https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf/resolve/6ed5e12bf84b7a63069882c91dd9e9218647d17b/Ternary-Bonsai-2-27B-PQ2_0.gguf \
+  -o models/Ternary-Bonsai-2-27B-PQ2_0.gguf
+
+uv run python download_model.py --check-only
+```
+
+Wait for both assets to verify before running a question. This text-only example does not download a vision projector.
+
+## Start and check the server
+
+For the normal workflow, run `uv run python ask_linda.py`: the Python helper handles startup, readiness, and cleanup automatically. It waits up to 180 seconds for startup; the Linda script allows up to 300 seconds for an inference request.
+
+To keep the server running across multiple scripts, use a separate terminal:
+
+```sh
+bash start-server.sh
+```
+
+Leave that terminal running. Once the model has loaded, check these endpoints from another terminal:
+
+```sh
+curl --fail --silent --show-error http://127.0.0.1:8087/health
+curl --fail --silent --show-error http://127.0.0.1:8087/v1/models
+```
+
+The health response should contain `"status":"ok"`; the model list should include `bonsai-2-27b`. Then run `uv run python ask_linda.py` from the repository root. It will reuse this server. Press Ctrl-C in the server terminal when finished to release the model's memory.
+
+The server binds to loopback (`127.0.0.1`) and uses port `8087`. EDSL's base URL includes `/v1`: `http://127.0.0.1:8087/v1`. The model name `bonsai-2-27b` is the alias set by the launcher, not the Hugging Face repository name.
+
+### Troubleshooting setup
+
+| Symptom | Check or fix |
+| --- | --- |
+| `uv: command not found` | Open a new terminal after installing uv and check `uv --version`. |
+| `No module named bonsai_server` | Run the script from this repository, alongside `bonsai_server.py`; it is not an EDSL dependency. |
+| Missing `llama-server` or GGUF file | Run `uv run python download_model.py` and check the directory layout above. |
+| Error requiring the OpenAI SDK's `aiohttp` extra | Run `uv sync --locked`; a manual environment needs `openai[aiohttp]`. |
+| Connection refused or model startup timeout | Inspect `managed-server.log`, or run `bash start-server.sh` to see startup diagnostics directly. |
+| Port 8087 already in use, or unexpected model replies | Check `/v1/models` and the process serving that port. The helper reuses a healthy server, so confirm its model and settings. |
+| Answer is `None` or inference raises an exception | Inspect the server log and saved errors. The example raises on inference failure and checks for a missing answer. |
+| Checksum mismatch or interrupted download | Rerun the downloader; it verifies existing files and replaces them only after a successful download and checksum. |
 
 ## The EDSL connection
 
