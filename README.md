@@ -4,7 +4,51 @@ Run PrismML's **Ternary Bonsai 2 27B** locally through [EDSL](https://github.com
 
 The original run used an **Apple M4 Max MacBook Pro with 48 GB unified memory**, PQ2_0 weights, and PrismML's Metal-enabled llama.cpp fork. The model weights occupy **7.21 GB**; this is not a measurement of total runtime memory. Other Macs have not been tested here. The included launcher targets Apple Silicon macOS; Linux/CUDA requires a different runtime.
 
-**Read without running:** [academic report (PDF)](paper/bonsai_edsl_report.pdf) · [observed results](behavioral_bias_run/report.md) · [all prompts and answers](behavioral_bias_run/all_responses.md) · [methodology](BEHAVIORAL_TESTS.md)
+## Read the paper
+
+**[Read the 16-page academic report (PDF)](paper/bonsai_edsl_report.pdf)** · **[Open/download the PDF directly](https://raw.githubusercontent.com/expectedparrot/edsl-bonsai-behavioral-tests/main/paper/bonsai_edsl_report.pdf)**
+
+*Local Language-Model Inference with EDSL: An Exploratory Behavioral Evaluation of Bonsai 2 27B* explains the local setup, EDSL code, experimental design, observed answers, limitations, and possible Modal deployment. Its appendix includes every question and the observed answer distributions. The [LaTeX source](paper/bonsai_edsl_report.tex) and [build instructions](paper/README.md) are included.
+
+You can read the paper and inspect all results without installing Python or downloading the model. For a shorter account, start with [the findings below](#what-happened-in-the-original-run), the [full results table](behavioral_bias_run/report.md), or [every prompt and answer](behavioral_bias_run/all_responses.md).
+
+## What we did
+
+We asked two questions: **Can EDSL run this model locally on a MacBook Pro?** And **how does it answer a small set of questions designed to probe behavioral biases?** The local workflow worked. The answers were often correct on explicit numerical and logical tasks, but the model's success on the familiar Linda question did not carry over consistently to a newly written conjunction question.
+
+1. **Connected a local model to EDSL.** We downloaded PrismML's PQ2_0 weights and its Metal-enabled `llama-server`, then exposed the model at `http://127.0.0.1:8087/v1`. EDSL used its existing `openai_compatible` provider to send prompts and collect structured results. Model inference took place on the Mac.
+2. **Started with a simple question.** The initial free-text example asked “What is the capital of France?” and returned Paris. We then changed the example to Linda's occupation: is she more likely to be a bank teller, or a bank teller who is also active in the feminist movement? The current [`ask_linda.py`](ask_linda.py) demonstrates that multiple-choice workflow.
+3. **Made startup automatic.** A missing or unready server had produced a missing answer in the initial setup. The [`bonsai_server.py`](bonsai_server.py) helper starts the executable as a subprocess, waits for readiness, and cleans up afterward. The example raises on inference failure and checks that an answer was returned.
+4. **Expanded to a behavioral battery.** We constructed 21 conditions across 11 task families, with four responses per condition: **84 independent, one-question interviews**. These covered conjunction, base rates, coin-flip independence, framing, anchoring, sunk costs, logical falsification, defaults, payment timing, decoys, and arithmetic. The original run took place September 17, 2026, in the America/New_York time zone.
+5. **Saved and audited the evidence.** EDSL saved the Jobs specifications and Results packages. We exported answers, counted matches to explicit answer keys, compared matched preference conditions, and inspected completion IDs, validation, and formatting anomalies. The PDF was written from these saved artifacts; generating the report required no new inference.
+
+### How the experiment was constructed
+
+[`behavioral_biases.py`](behavioral_biases.py) defines each condition's prompt, alternatives where applicable, and scoring key. EDSL turns those definitions into executable interviews:
+
+| EDSL object | Role in this example |
+| --- | --- |
+| `QuestionMultipleChoice` / `QuestionNumerical` | Defines the answer format and requests a brief explanation. |
+| `ScenarioList` | Supplies each prompt and its option order to the question template. |
+| `Model` | Selects the local Bonsai alias and generation parameters. |
+| `Jobs` | Combines the question, scenarios, and model into a saved execution specification. |
+| `Results` | Preserves answers, rendered prompts, raw server responses, and validation data. |
+
+Multiple-choice conditions used the original and reversed option orders, with two draws for each order. Numerical conditions used four iterations. Each interview began independently, with no previous answers, no persona traits, and no bias labels or scoring keys in the rendered question. We requested explanations of at most two sentences.
+
+Generation used temperature 1.0, top-p 0.95, an 8192-token context, a 2048-token output limit, and a 512-token server-side reasoning budget. An empty EDSL cache for each family and distinct iteration keys supported fresh draws; we then checked that all 84 saved completion IDs were distinct. EDSL answer validation checks the response contract—it does **not** establish that the answer or explanation is correct.
+
+See [the methodology](BEHAVIORAL_TESTS.md), [exact conditions and answer keys](behavioral_bias_run/conditions.json), and [recorded protocol](behavioral_bias_run/protocol.json) for details.
+
+### Choose what you want to do
+
+| Goal | Start here |
+| --- | --- |
+| Read the experiment and its limitations | [PDF report](paper/bonsai_edsl_report.pdf) or [findings](#what-happened-in-the-original-run) |
+| Ask one question on your Mac | [Quick start](#quick-start) |
+| Understand the dependency and runtime setup | [EDSL installation](#install-edsl-at-the-tested-commit) and [Bonsai installation](#install-the-bonsai-server-and-model) |
+| Inspect saved results or run the full battery | [Battery instructions](#run-the-behavioral-battery) |
+| Adapt the EDSL code to a new question | [The EDSL connection](#the-edsl-connection) |
 
 ## Quick start
 
@@ -263,16 +307,38 @@ uv run python summarize_biases.py --output behavioral_bias_run
 
 ## What happened in the original run?
 
-| Observation | Result |
+The clearest contrast was between two conjunction questions. Bonsai chose **“Linda is a bank teller” in all four draws**, correctly avoiding the more restrictive conjunction. In the new astronomy vignette, however, it chose **“Morgan works as an accountant and belongs to an astronomy club” in three of four draws**, rather than accountant alone.
+
+![Eight conjunction responses: all four Linda answers were correct, while three of four answers to the new astronomy vignette were conjunction errors.](paper/conjunction_results.png)
+
+Each symbol is one response, grouped by option order and draw. A conjunction cannot be more probable than either of its component events: everyone who is both an accountant and an astronomy-club member is an accountant. The model's astronomy-based explanation did not resolve that logical constraint. The errors occurred in both option orders.
+
+Here is what the rest of the battery returned:
+
+| Task or comparison | Observed responses |
 | --- | --- |
-| Questions with explicit answer keys | 41/44 correct |
-| Canonical Linda conjunction item | 4/4 correct |
-| New astronomy conjunction vignette | 1/4 correct; three conjunction errors |
-| Bayes, independent coins, sunk costs, logical cards, arithmetic | All scored answers correct |
-| Matched preference/estimate conditions | No consistent classic bias pattern in this small sample |
-| Completion audit | 84 validated answers; 84 distinct completion IDs |
+| Base rates | Correct posterior probabilities: 7.48% with 1% prevalence and 84.21% with 40% prevalence; 4/4 each. |
+| Independent coin flips | Heads and tails equally likely after both a streak and a mixed sequence; 4/4 each. |
+| Framing | Guaranteed recovery of 300 files in both the saved and lost frames; 4/4 each. |
+| Anchoring | Mean estimates of 42.92 hours after anchor 10 and 42.77 after anchor 100; no shift toward the higher anchor. |
+| Sunk costs | Stop the unprofitable project after either $0 or $8,000 already spent; 4/4 each. |
+| Logical falsification | Turn over E and 7 in the card task; 4/4. |
+| Defaults | Chose Plan B in 2/4 draws when A was preselected, versus 1/4 when B was preselected. |
+| Payment timing | Later $60 over earlier $50 for both immediate and year-delayed choices; 4/4 each. |
+| Decoy | Digital-and-print bundle with or without the print-only decoy; 4/4 each. |
+| Arithmetic | Pen costs $0.40 and cake weighs 6 kg; 4/4 each. |
+
+**Overall: 41 of 44 answers with explicit scoring keys were correct.** All three errors were in the new conjunction vignette. The other 40 responses were preference or estimation comparisons and were not counted as correct or incorrect. All 84 answers passed EDSL's format validation and had distinct completion IDs.
+
+### What we learned—and what remains uncertain
+
+The tested Mac could run the model and EDSL together, with Python managing the server lifecycle. The experimental results suggest strong performance on these explicit numerical and logical questions, alongside uneven performance across conjunction vignettes. They justify a follow-up using more unfamiliar questions, paraphrases, option orders, and reasoning budgets.
 
 The preference conditions are not included in the accuracy denominator. Four draws per condition from one model do not establish general rationality, a population bias rate, or similarity to human respondents. Familiarity with canonical questions is one possible explanation for the conjunction contrast, not a demonstrated mechanism. One completion leaked reasoning into the answer channel; the report documents it and its effect on interpretation.
+
+Several null-looking comparisons are also limited by their design: the decoy question already had 100% bundle choice without the decoy, the anchor was explicitly described as random, and the coin question explicitly stated independence. The logical-card item is a narrow falsification task, not a comprehensive test of confirmation bias. A correct answer may still be accompanied by a flawed explanation; one payment-timing explanation misstated the interval.
+
+For the complete evidence, read the [PDF](paper/bonsai_edsl_report.pdf), [all prompts and final answers](behavioral_bias_run/all_responses.md), or the exported [CSV](behavioral_bias_run/responses.csv) / [JSON](behavioral_bias_run/responses.json). New runs belong in `runs/`; the published observations remain in `behavioral_bias_run/`.
 
 ## Reproducibility and repository layout
 
