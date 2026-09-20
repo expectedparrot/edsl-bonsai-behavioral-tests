@@ -1,0 +1,17 @@
+{
+  "model_repo": "prism-ml/Ternary-Bonsai-2-27B-gguf",
+  "model_revision": "6ed5e12bf84b7a63069882c91dd9e9218647d17b",
+  "model_file": {
+    "rfilename": "Ternary-Bonsai-2-27B-PQ2_0.gguf",
+    "blobId": "8d0823f96b78839696c57d6ee544160444f956f7",
+    "size": 7206168928,
+    "lfs": {
+      "sha256": "3907dc1658db1f78a9826bf8d5bcb8dc65db0d466388937af57f2294fae62ec1",
+      "size": 7206168928,
+      "pointerSize": 135
+    }
+  },
+  "runtime_tag": "prism-b10683-d8f26ee",
+  "runtime_asset": "llama-prism-b10683-d8f26ee-bin-macos-arm64.tar.gz",
+  "runtime_digest": "sha256:0ae163ca2c9cce92470316ed743f76985beea4d5cf31b8dc546711cf6fc8dd35"
+}

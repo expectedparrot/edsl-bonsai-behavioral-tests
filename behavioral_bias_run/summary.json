@@ -1,0 +1,257 @@
+{
+  "audit": {
+    "expected_responses": 84,
+    "saved_responses": 84,
+    "validated": 84,
+    "unique_completion_ids": 84,
+    "missing_completion_ids": 0,
+    "finish_reasons": {
+      "stop": 84
+    },
+    "explicit_cache_hits": 0,
+    "reasoning_in_answer_channel": 1,
+    "note": "This EDSL version may omit cache flags; distinct completion IDs are the primary duplicate check."
+  },
+  "conditions": [
+    {
+      "family": "conjunction",
+      "condition": "linda",
+      "n": 4,
+      "counts": {
+        "Linda is a bank teller.": 4
+      },
+      "correct": "Linda is a bank teller.",
+      "correct_count": 4
+    },
+    {
+      "family": "conjunction",
+      "condition": "new_vignette",
+      "n": 4,
+      "counts": {
+        "Morgan works as an accountant.": 1,
+        "Morgan works as an accountant and belongs to an astronomy club.": 3
+      },
+      "correct": "Morgan works as an accountant.",
+      "correct_count": 1
+    },
+    {
+      "family": "base_rate",
+      "condition": "rare",
+      "n": 4,
+      "counts": {
+        "7.48": 4
+      },
+      "correct": 7.48,
+      "correct_count": 4,
+      "mean": 7.48,
+      "median": 7.48,
+      "minimum": 7.48,
+      "maximum": 7.48
+    },
+    {
+      "family": "base_rate",
+      "condition": "common",
+      "n": 4,
+      "counts": {
+        "84.21": 4
+      },
+      "correct": 84.21,
+      "correct_count": 4,
+      "mean": 84.21,
+      "median": 84.21,
+      "minimum": 84.21,
+      "maximum": 84.21
+    },
+    {
+      "family": "gambler",
+      "condition": "streak",
+      "n": 4,
+      "counts": {
+        "Heads and tails are equally likely": 4
+      },
+      "correct": "Heads and tails are equally likely",
+      "correct_count": 4
+    },
+    {
+      "family": "gambler",
+      "condition": "mixed",
+      "n": 4,
+      "counts": {
+        "Heads and tails are equally likely": 4
+      },
+      "correct": "Heads and tails are equally likely",
+      "correct_count": 4
+    },
+    {
+      "family": "framing",
+      "condition": "saved",
+      "n": 4,
+      "counts": {
+        "Plan A": 4
+      },
+      "correct": null,
+      "correct_count": null
+    },
+    {
+      "family": "framing",
+      "condition": "lost",
+      "n": 4,
+      "counts": {
+        "Plan A": 4
+      },
+      "correct": null,
+      "correct_count": null
+    },
+    {
+      "family": "anchoring",
+      "condition": "low",
+      "n": 4,
+      "counts": {
+        "43": 3,
+        "42.67": 1
+      },
+      "correct": null,
+      "correct_count": null,
+      "mean": 42.917500000000004,
+      "median": 43.0,
+      "minimum": 42.67,
+      "maximum": 43
+    },
+    {
+      "family": "anchoring",
+      "condition": "high",
+      "n": 4,
+      "counts": {
+        "42.67": 1,
+        "42.7": 2,
+        "43": 1
+      },
+      "correct": null,
+      "correct_count": null,
+      "mean": 42.7675,
+      "median": 42.7,
+      "minimum": 42.67,
+      "maximum": 43
+    },
+    {
+      "family": "sunk_cost",
+      "condition": "none",
+      "n": 4,
+      "counts": {
+        "Stop the project": 4
+      },
+      "correct": "Stop the project",
+      "correct_count": 4
+    },
+    {
+      "family": "sunk_cost",
+      "condition": "large",
+      "n": 4,
+      "counts": {
+        "Stop the project": 4
+      },
+      "correct": "Stop the project",
+      "correct_count": 4
+    },
+    {
+      "family": "confirmation",
+      "condition": "card_test",
+      "n": 4,
+      "counts": {
+        "E and 7": 4
+      },
+      "correct": "E and 7",
+      "correct_count": 4
+    },
+    {
+      "family": "default",
+      "condition": "a_default",
+      "n": 4,
+      "counts": {
+        "Plan A": 2,
+        "Plan B": 2
+      },
+      "correct": null,
+      "correct_count": null
+    },
+    {
+      "family": "default",
+      "condition": "b_default",
+      "n": 4,
+      "counts": {
+        "Plan A": 3,
+        "Plan B": 1
+      },
+      "correct": null,
+      "correct_count": null
+    },
+    {
+      "family": "present_bias",
+      "condition": "now",
+      "n": 4,
+      "counts": {
+        "The later $60 payment": 4
+      },
+      "correct": null,
+      "correct_count": null
+    },
+    {
+      "family": "present_bias",
+      "condition": "later",
+      "n": 4,
+      "counts": {
+        "The later $60 payment": 4
+      },
+      "correct": null,
+      "correct_count": null
+    },
+    {
+      "family": "decoy",
+      "condition": "without_decoy",
+      "n": 4,
+      "counts": {
+        "Digital and print subscription: $120": 4
+      },
+      "correct": null,
+      "correct_count": null
+    },
+    {
+      "family": "decoy",
+      "condition": "with_decoy",
+      "n": 4,
+      "counts": {
+        "Digital and print subscription: $120": 4
+      },
+      "correct": null,
+      "correct_count": null
+    },
+    {
+      "family": "intuitive_arithmetic",
+      "condition": "notebook_pen",
+      "n": 4,
+      "counts": {
+        "0.4": 4
+      },
+      "correct": 0.4,
+      "correct_count": 4,
+      "mean": 0.4,
+      "median": 0.4,
+      "minimum": 0.4,
+      "maximum": 0.4
+    },
+    {
+      "family": "intuitive_arithmetic",
+      "condition": "cake",
+      "n": 4,
+      "counts": {
+        "6": 4
+      },
+      "correct": 6,
+      "correct_count": 4,
+      "mean": 6,
+      "median": 6.0,
+      "minimum": 6,
+      "maximum": 6
+    }
+  ]
+}

@@ -1,0 +1,220 @@
+[
+  {
+    "family": "conjunction",
+    "condition": "linda",
+    "prompt": "Linda is 31 years old, single, outspoken, and very bright. She majored in philosophy. As a student, she was deeply concerned with issues of discrimination and social justice, and also participated in anti-nuclear demonstrations. Which is more probable?",
+    "options": [
+      "Linda is a bank teller.",
+      "Linda is a bank teller and is active in the feminist movement."
+    ],
+    "correct": "Linda is a bank teller.",
+    "note": "A conjunction cannot be more probable than its component."
+  },
+  {
+    "family": "conjunction",
+    "condition": "new_vignette",
+    "prompt": "Morgan loves star charts, spends clear evenings photographing planets, and volunteers at a planetarium. Which is more probable?",
+    "options": [
+      "Morgan works as an accountant.",
+      "Morgan works as an accountant and belongs to an astronomy club."
+    ],
+    "correct": "Morgan works as an accountant.",
+    "note": ""
+  },
+  {
+    "family": "base_rate",
+    "condition": "rare",
+    "prompt": "A factory produces parts, of which 1% are defective. A scanner flags 80% of defective parts and also flags 10% of non-defective parts. A part is randomly selected and is flagged. What is the probability that it is defective? Give a percentage from 0 to 100, rounded to two decimal places.",
+    "options": null,
+    "correct": 7.48,
+    "note": "Bayes rule; numeric tolerance 0.1 percentage points."
+  },
+  {
+    "family": "base_rate",
+    "condition": "common",
+    "prompt": "A factory produces parts, of which 40% are defective. A scanner flags 80% of defective parts and also flags 10% of non-defective parts. A part is randomly selected and is flagged. What is the probability that it is defective? Give a percentage from 0 to 100, rounded to two decimal places.",
+    "options": null,
+    "correct": 84.21,
+    "note": "Bayes rule; numeric tolerance 0.1 percentage points."
+  },
+  {
+    "family": "gambler",
+    "condition": "streak",
+    "prompt": "A fair coin has been flipped six times, producing heads, heads, heads, heads, heads, heads. Each flip is independent. On the next flip, which outcome is more likely?",
+    "options": [
+      "Heads",
+      "Tails",
+      "Heads and tails are equally likely"
+    ],
+    "correct": "Heads and tails are equally likely",
+    "note": ""
+  },
+  {
+    "family": "gambler",
+    "condition": "mixed",
+    "prompt": "A fair coin has been flipped six times, producing heads, tails, tails, heads, tails, heads. Each flip is independent. On the next flip, which outcome is more likely?",
+    "options": [
+      "Heads",
+      "Tails",
+      "Heads and tails are equally likely"
+    ],
+    "correct": "Heads and tails are equally likely",
+    "note": ""
+  },
+  {
+    "family": "framing",
+    "condition": "saved",
+    "prompt": "A damaged archive contains 900 files. Choose a recovery plan. Plan A will save exactly 300 files. Plan B has a 1/3 chance of saving all 900 files and a 2/3 chance of saving none. Every file is equally valuable; these are the complete outcomes. Which plan do you choose?",
+    "options": [
+      "Plan A",
+      "Plan B"
+    ],
+    "correct": null,
+    "note": "Compare Plan B rate with equivalent lost-files wording; no uniquely correct risk preference."
+  },
+  {
+    "family": "framing",
+    "condition": "lost",
+    "prompt": "A damaged archive contains 900 files. Choose a recovery plan. Plan A will lose exactly 600 files. Plan B has a 1/3 chance of losing no files and a 2/3 chance of losing all 900 files. Every file is equally valuable; these are the complete outcomes. Which plan do you choose?",
+    "options": [
+      "Plan A",
+      "Plan B"
+    ],
+    "correct": null,
+    "note": ""
+  },
+  {
+    "family": "anchoring",
+    "condition": "low",
+    "prompt": "You are estimating the engineering hours for a new module. Three comparable modules required 38, 44, and 46 hours. The new module is similar in scope and staffing. Before you estimate, an unrelated random-number generator displays 10. Consider whether the new module will take more or less than 10 hours. What is your best estimate of its total engineering hours? Return a number of hours.",
+    "options": null,
+    "correct": null,
+    "note": "Compare high versus low estimates; random number supplies no information; no unique point estimate imposed."
+  },
+  {
+    "family": "anchoring",
+    "condition": "high",
+    "prompt": "You are estimating the engineering hours for a new module. Three comparable modules required 38, 44, and 46 hours. The new module is similar in scope and staffing. Before you estimate, an unrelated random-number generator displays 100. Consider whether the new module will take more or less than 100 hours. What is your best estimate of its total engineering hours? Return a number of hours.",
+    "options": null,
+    "correct": null,
+    "note": "Compare high versus low estimates; random number supplies no information; no unique point estimate imposed."
+  },
+  {
+    "family": "sunk_cost",
+    "condition": "none",
+    "prompt": "You manage a project and have already spent $0, which cannot be recovered. Finishing will cost an additional $4000 and yield revenue of exactly $2500. Stopping costs nothing and yields no further revenue. There are no reputation, learning, contractual, or other consequences. Your sole objective is to maximize final net money. What do you do?",
+    "options": [
+      "Finish the project",
+      "Stop the project"
+    ],
+    "correct": "Stop the project",
+    "note": ""
+  },
+  {
+    "family": "sunk_cost",
+    "condition": "large",
+    "prompt": "You manage a project and have already spent $8000, which cannot be recovered. Finishing will cost an additional $4000 and yield revenue of exactly $2500. Stopping costs nothing and yields no further revenue. There are no reputation, learning, contractual, or other consequences. Your sole objective is to maximize final net money. What do you do?",
+    "options": [
+      "Finish the project",
+      "Stop the project"
+    ],
+    "correct": "Stop the project",
+    "note": ""
+  },
+  {
+    "family": "confirmation",
+    "condition": "card_test",
+    "prompt": "Each card has a letter on one side and a number on the other. Four cards show E, K, 4, and 7. You must test the rule: If a card has a vowel on one side, then it has an even number on the other. Which cards must you turn over, and only those cards, to determine whether the rule is violated?",
+    "options": [
+      "E and 4",
+      "E and 7",
+      "E only",
+      "All four cards"
+    ],
+    "correct": "E and 7",
+    "note": "Wason-style logical falsification probe; a wrong answer alone does not isolate confirmation bias."
+  },
+  {
+    "family": "default",
+    "condition": "a_default",
+    "prompt": "Choose between two internet plans. Plan A costs $40 per month with 100 Mbps service. Plan B costs $50 per month with 200 Mbps service. All other terms are identical. You have no urgent budget constraint, and either speed handles your current needs. The form randomly preselects Plan A; this is not a recommendation. Choosing either plan takes the same effort and has no switching cost. Which do you choose?",
+    "options": [
+      "Plan A",
+      "Plan B"
+    ],
+    "correct": null,
+    "note": "Compare Plan B rate across defaults; no unique correct preference."
+  },
+  {
+    "family": "default",
+    "condition": "b_default",
+    "prompt": "Choose between two internet plans. Plan A costs $40 per month with 100 Mbps service. Plan B costs $50 per month with 200 Mbps service. All other terms are identical. You have no urgent budget constraint, and either speed handles your current needs. The form randomly preselects Plan B; this is not a recommendation. Choosing either plan takes the same effort and has no switching cost. Which do you choose?",
+    "options": [
+      "Plan A",
+      "Plan B"
+    ],
+    "correct": null,
+    "note": "Compare Plan B rate across defaults; no unique correct preference."
+  },
+  {
+    "family": "present_bias",
+    "condition": "now",
+    "prompt": "Choose one guaranteed payment: $50 today, or $60 in 30 days. Both payments are equally certain, there are no fees or inflation, and you have no immediate cash needs or borrowing constraints. Which do you choose?",
+    "options": [
+      "The earlier $50 payment",
+      "The later $60 payment"
+    ],
+    "correct": null,
+    "note": "Look for greater earlier-payment share in now condition; repeated samples are not longitudinal individuals."
+  },
+  {
+    "family": "present_bias",
+    "condition": "later",
+    "prompt": "Choose one guaranteed payment: $50 in 365 days, or $60 in 395 days. Both payments are equally certain, there are no fees or inflation, and you have no immediate cash needs or borrowing constraints. Which do you choose?",
+    "options": [
+      "The earlier $50 payment",
+      "The later $60 payment"
+    ],
+    "correct": null,
+    "note": "Look for greater earlier-payment share in now condition; repeated samples are not longitudinal individuals."
+  },
+  {
+    "family": "decoy",
+    "condition": "without_decoy",
+    "prompt": "Choose an annual magazine subscription for yourself. You enjoy both digital reading and paper magazines, have no strong preference between formats, and can afford every option. All options contain the same editorial content. Which subscription do you choose?",
+    "options": [
+      "Digital subscription: $60",
+      "Digital and print subscription: $120"
+    ],
+    "correct": null,
+    "note": "Compare bundle share when dominated print-only option is added; preference is not correctness."
+  },
+  {
+    "family": "decoy",
+    "condition": "with_decoy",
+    "prompt": "Choose an annual magazine subscription for yourself. You enjoy both digital reading and paper magazines, have no strong preference between formats, and can afford every option. All options contain the same editorial content. Which subscription do you choose?",
+    "options": [
+      "Digital subscription: $60",
+      "Digital and print subscription: $120",
+      "Print-only subscription: $120"
+    ],
+    "correct": null,
+    "note": "Compare bundle share when dominated print-only option is added; preference is not correctness."
+  },
+  {
+    "family": "intuitive_arithmetic",
+    "condition": "notebook_pen",
+    "prompt": "A notebook and a pen cost $8.80 in total. The notebook costs $8.00 more than the pen. How much does the pen cost, in dollars?",
+    "options": null,
+    "correct": 0.4,
+    "note": "Intuitive lure is $0.80; correct answer is $0.40."
+  },
+  {
+    "family": "intuitive_arithmetic",
+    "condition": "cake",
+    "prompt": "A whole cake weighs 3 kilograms plus half of its own weight. How many kilograms does the whole cake weigh?",
+    "options": null,
+    "correct": 6,
+    "note": "Solve w = 3 + w/2; correct answer is 6 kg."
+  }
+]

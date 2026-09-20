@@ -1,0 +1,37 @@
+{
+  "model": {
+    "model": "bonsai-2-27b",
+    "parameters": {
+      "temperature": 1.0,
+      "max_tokens": 2048,
+      "top_p": 0.95,
+      "frequency_penalty": 0,
+      "presence_penalty": 0,
+      "logprobs": false,
+      "top_logprobs": 3,
+      "reasoning_effort": null
+    },
+    "inference_service": "openai_compatible",
+    "connection": {
+      "base_url": "http://127.0.0.1:8087/v1"
+    },
+    "edsl_version": "1.0.8.dev1",
+    "edsl_class_name": "LanguageModel"
+  },
+  "conditions": 21,
+  "repetitions_per_condition": 4,
+  "interviews": 84,
+  "fresh": true,
+  "max_concurrency": 1,
+  "seed_for_order": 20260917,
+  "cache": "Empty in-memory Cache per family, distinct iteration keys; audit unique completion IDs and any available cache flags.",
+  "server_settings": "start-server.sh: 8192 context, 512 reasoning budget, one slot; inspect running server if reused",
+  "design": "Independent one-question interviews; no bias names or answer keys in rendered prompts. MC options forward twice and reverse twice (not full counterbalancing for >2 options). No participant persona. EDSL default agent instructions. Comments requested. These are stochastic model responses, not human subjects or independent model replications.",
+  "actual_system_prompt": "Empty string; empty default Agent traits.",
+  "source_sha256": {
+    "behavioral_biases.py": "c373225fc9d0dac74fafe1ebc566f3ed0bbc62d8058024e429ab46147a27e1f6",
+    "summarize_biases.py": "506ccd6b94f51fe76e8d55f3c8ec3f7f3622cdc08dd0b21b26dc99acbd01b0c4",
+    "start-server.sh": "14f3ccd5dca84dc85a049f46f30c3ce90b9c116c6305a1c7d51e513f5a9a5839"
+  },
+  "runtime_notes": "Runner started and shut down the server. Conjunction results were checkpointed before a results-export fix; remaining families were resumed using identical inference parameters. Setup pilot is excluded."
+}

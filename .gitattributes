@@ -1,0 +1,5 @@
+# Preserve original experimental bytes and source hashes.
+behavioral_bias_run/*.csv -text -whitespace
+original_scripts/** -text -whitespace
+*.ep binary
+*.pdf binary
